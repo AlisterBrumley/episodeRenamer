@@ -26,13 +26,16 @@
 import re
 from pathlib import Path
 
-filelist = sorted(Path.cwd().rglob("*.*"))
+# NEEDS TO HAVE FILETYPE OTHERWISE IT WILL PICKUP DS_STORE AND OTHER NASTIES
+filelist = sorted(Path.cwd().rglob("*.mkv"))
 seriesCount = "1"
 episodeCount = 1
 
 for file in filelist:
+    # presumes series folders are named 'S#' and grabs the number
     seriesDir = file.parent.name[1]
 
+    # checks if above number is a number, if not skip
     if not seriesDir.isnumeric():
         continue
     elif seriesCount < seriesDir:
@@ -40,16 +43,17 @@ for file in filelist:
         episodeCount = 1
 
     series = "S0" + seriesCount
-    episode = "E0" + str(episodeCount)
+    episode = "E" + str(episodeCount).zfill(2)
     renamed = re.sub(r"S0\dE\d+", series + episode, str(file))
     file.rename(renamed)
-    print(renamed)
+    # print(renamed)
     episodeCount += 1
 
 # WORKS IF RAN FROM VIDEO FILE DIR
 # TODO
 # ADD TYPER OPTIONS
 # TEST MODE THAT DUMPS FILEAMES INSTEAD OF RENAMING
-# MAYBE NOT RGLOB
+# MAYBE NOT RGLOB?
+# FILE TYPES SELECTION?
 # RUN CHECKS FOR DIFFERENT S##E## STRNGS
 # IF 3 DIGIT EPISODE COUNT, MAKE ALL 3 DIGIT
